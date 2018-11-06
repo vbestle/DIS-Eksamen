@@ -133,3 +133,24 @@ public class UserController {
     return user;
   }
 }
+
+/*
+
+  // Delete User metode
+  public static User deleteUser(int id) {
+
+
+    // Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    // Delete the user from the DB
+    String sql = "DELETE FROM user WHERE id=" + id;
+
+    dbCon.deleteUser(sql);
+
+
+  }
+}
+*/

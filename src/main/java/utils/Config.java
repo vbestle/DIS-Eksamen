@@ -15,14 +15,26 @@ public final class Config {
   private static String DATABASE_PASSWORD;
   private static String DATABASE_NAME;
   private static boolean ENCRYPTION;
+  //opretter encryption key
+  private static String ENCRYPTION_KEY;
   private static String SOLR_HOST;
   private static int SOLR_PORT;
   private static String SOLR_PATH;
   private static String SOLR_CORE;
   private static long PRODUCT_TTL;
+  // Opretter TTL for User og Order
+  private static long ORDER_TTL;
+  private static long USER_TTL;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
+  }
+  //Oprette get metoder for User og Order
+  public static long getOrderTtl() {
+    return ORDER_TTL;
+  }
+  public static long getUserTtl() {
+    return USER_TTL;
   }
 
   public static String getDatabaseHost() {
@@ -48,6 +60,9 @@ public final class Config {
   public static Boolean getEncryption() {
     return ENCRYPTION;
   }
+
+  //opretter Encryption Key
+  public static String getEncryptionKey(){return ENCRYPTION_KEY;}
 
   public static String getSolrHost() {
     return SOLR_HOST;
@@ -94,10 +109,16 @@ public final class Config {
     DATABASE_PASSWORD = json.get("DATABASE_PASSWORD").toString().replace("\"", "");
     DATABASE_NAME = json.get("DATABASE_NAME").toString().replace("\"", "");
     ENCRYPTION = json.get("ENCRYPTION").getAsBoolean();
+
+    ENCRYPTION_KEY = json.get("ENCRYPTION_KEY").getAsString();
+
     SOLR_HOST = json.get("SOLR_HOST").toString().replace("\"", "");
     SOLR_PORT = Integer.parseInt(json.get("SOLR_PORT").toString().replace("\"", ""));
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+
+    ORDER_TTL = json.get("ORDER_TTL").getAsLong();
+    USER_TTL = json.get("USER_TTL").getAsLong();
   }
 }
