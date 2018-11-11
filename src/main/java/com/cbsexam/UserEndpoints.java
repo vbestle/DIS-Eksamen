@@ -97,10 +97,21 @@ public class UserEndpoints {
   }
 
   // TODO: Make the system able to delete users
-  public Response deleteUser(String x) {
+  @POST
+  @Path("delete/{delete}")
+  public Response deleteUser(@PathParam("delete") int userToDeleteId) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+
+    boolean deleted = UserController.deleteUser(userToDeleteId);
+    userCache.getUsers(true);
+
+    if(deleted){
+
+      return Response.status(200).entity("User " + userToDeleteId + " has been deleted").build();
+    } else {
+      return Response.status(400).entity("Colud not delete user. Check if user exist").build();
+    }
+
   }
 
   // TODO: Make the system able to update users

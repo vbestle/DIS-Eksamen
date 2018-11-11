@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import model.User;
+import utils.Hashing;
 import utils.Log;
 
 public class UserController {
@@ -107,14 +108,14 @@ public class UserController {
     }
 
     // Insert the user in the DB
-    // TODO: Hash the user password before saving it.
+    // TODO: Hash the user password before saving it. (FIX)
     int userID = dbCon.insert(
         "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
             + user.getFirstname()
             + "', '"
             + user.getLastname()
             + "', '"
-            + user.getPassword()
+            + Hashing.sha(user.getPassword()) //hash tilføjet
             + "', '"
             + user.getEmail()
             + "', "
@@ -132,12 +133,12 @@ public class UserController {
     // Return user
     return user;
   }
-}
 
-/*
+
+
 
   // Delete User metode
-  public static User deleteUser(int id) {
+  public static boolean deleteUser(int id) {
 
 
     // Check for DB Connection
@@ -146,11 +147,12 @@ public class UserController {
     }
 
     // Delete the user from the DB
+    User userToDelete = UserController.getUser(id);
     String sql = "DELETE FROM user WHERE id=" + id;
 
-    dbCon.deleteUser(sql);
+    return userToDelete != null && dbCon.deleteUser(sql);
 
 
   }
 }
-*/
+

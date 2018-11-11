@@ -110,13 +110,9 @@ public class DatabaseController {
     // Return the resultset which at this point will be null
     return result;
   }
-}
 
-  /*
-  public int deleteUser(String sql) {
 
-    // Set key to 0 as a start
-    int result = 0;
+  public boolean deleteUser(String sql) {
 
     // Check that we have connection
     if (connection == null)
@@ -128,15 +124,16 @@ public class DatabaseController {
               connection.prepareStatement(sql);
 
       // Execute query
-      result = statement.executeUpdate();
+      int rowsAffected = statement.executeUpdate();
 
-
+      if (rowsAffected == 1) {
+        return true;
+      }
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
-
-    // Return the resultset which at this point will be null
-    return result;
+    return false;
   }
+
+
 }
-*/
