@@ -25,6 +25,7 @@ public final class Config {
   // Opretter TTL for User og Order
   private static long ORDER_TTL;
   private static long USER_TTL;
+  private static String SALT_KEY;
 
   public static long getProductTtl() {
     return PRODUCT_TTL;
@@ -80,6 +81,8 @@ public final class Config {
     return SOLR_CORE;
   }
 
+  public static String getSaltKey() {return SALT_KEY;}
+
   public static void initializeConfig() throws IOException {
 
     // Init variables to parse JSON
@@ -120,5 +123,7 @@ public final class Config {
 
     ORDER_TTL = json.get("ORDER_TTL").getAsLong();
     USER_TTL = json.get("USER_TTL").getAsLong();
+
+    SALT_KEY = json.get("SALT_KEY").getAsString();
   }
 }

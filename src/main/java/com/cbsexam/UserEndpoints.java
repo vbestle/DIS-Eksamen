@@ -40,7 +40,7 @@ public class UserEndpoints {
   }
 
 
-  //Serialiserer Cache
+  //Initialiserer Cache
   private static UserCache userCache = new UserCache();
   /** @return Responses */
   @GET
@@ -96,7 +96,7 @@ public class UserEndpoints {
     return Response.status(400).entity("Endpoint not implemented yet").build();
   }
 
-  // TODO: Make the system able to delete users
+  // TODO: Make the system able to delete users (FIX)
   @POST
   @Path("delete/{delete}")
   public Response deleteUser(@PathParam("delete") int userToDeleteId) {

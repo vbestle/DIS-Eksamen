@@ -94,6 +94,9 @@ public class UserController {
     return users;
   }
 
+  //hashing initialiseres
+  public static Hashing hashing = new Hashing();
+
   public static User createUser(User user) {
 
     // Write in log that we've reach this step
@@ -115,7 +118,7 @@ public class UserController {
             + "', '"
             + user.getLastname()
             + "', '"
-            + Hashing.sha(user.getPassword()) //hash tilføjet
+            + hashing.saltingSha(user.getPassword()) //hash tilføjet
             + "', '"
             + user.getEmail()
             + "', "

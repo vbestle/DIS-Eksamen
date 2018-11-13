@@ -7,12 +7,15 @@ import org.bouncycastle.util.encoders.Hex;
 
 public final class Hashing {
 
-  // TODO: You should add a salt and make this secure
+  private String salt = Config.getSaltKey();
+
+  // TODO: You should add a salt and make this secure (FIX)
   public static String md5(String rawString) {
     try {
 
       // We load the hashing algoritm we wish to use.
       MessageDigest md = MessageDigest.getInstance("MD5");
+
 
       // We convert to byte array
       byte[] byteArray = md.digest(rawString.getBytes());
@@ -37,7 +40,16 @@ public final class Hashing {
     return null;
   }
 
-  // TODO: You should add a salt and make this secure
+
+  public String saltingMd5(String str) {
+
+    String salted = str + this.salt;
+
+    return sha(salted);
+  }
+
+
+  // TODO: You should add a salt and make this secure (FIX)
   public static String sha(String rawString) {
     try {
       // We load the hashing algoritm we wish to use.
@@ -57,5 +69,12 @@ public final class Hashing {
     }
 
     return rawString;
+  }
+
+  public String saltingSha(String str) {
+
+    String salted = str + this.salt;
+
+    return sha(salted);
   }
 }
