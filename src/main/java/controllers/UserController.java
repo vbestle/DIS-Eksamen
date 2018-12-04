@@ -3,9 +3,16 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import model.User;
 import utils.Hashing;
 import utils.Log;
+
+import javax.sound.midi.Soundbank;
 
 public class UserController {
 
@@ -33,12 +40,12 @@ public class UserController {
       // Get first object, since we only have one
       if (rs.next()) {
         user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
 
         // return the create object
         return user;
@@ -76,12 +83,12 @@ public class UserController {
       // Loop through DB Data
       while (rs.next()) {
         User user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
 
         // Add element to list
         users.add(user);
@@ -113,22 +120,22 @@ public class UserController {
     // Insert the user in the DB
     // TODO: Hash the user password before saving it. (FIX)
     int userID = dbCon.insert(
-        "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
-            + user.getFirstname()
-            + "', '"
-            + user.getLastname()
-            + "', '"
-            + hashing.saltingSha(user.getPassword()) //hash tilføjet
-            + "', '"
-            + user.getEmail()
-            + "', "
-            + user.getCreatedTime()
-            + ")");
+            "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
+                    + user.getFirstname()
+                    + "', '"
+                    + user.getLastname()
+                    + "', '"
+                    + hashing.saltingSha(user.getPassword()) //hash tilføjet
+                    + "', '"
+                    + user.getEmail()
+                    + "', "
+                    + user.getCreatedTime()
+                    + ")");
 
     if (userID != 0) {
       //Update the userid of the user before returning
       user.setId(userID);
-    } else{
+    } else {
       // Return null if user has not been inserted into database
       return null;
     }
@@ -136,8 +143,6 @@ public class UserController {
     // Return user
     return user;
   }
-
-
 
 
   // Delete User metode
@@ -157,5 +162,81 @@ public class UserController {
 
 
   }
-}
+
+
+//Update User metode
+/*
+  public static User updateUser(User id) {
+
+    // Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    User userToUpdate = UserController.getUser(id);
+    String sql = "UPDATE user SET(first_name, last_name, password, email) WHERE id=" + id;
+
+
+  }
+*/
+
+  //Authorize User metode til login
+
+  public static User authorizeUser(String loginEmail) {
+
+    // Check for DB Connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+      String sql = "SELECT * FROM user where email='" + loginEmail + "'";
+
+      //Kører SQL query
+      ResultSet resultSet = dbCon.query(sql);
+      User user = null;
+
+      //Henter objektet af User
+      try {
+        if (resultSet.next()) {
+          user = new User(
+                  resultSet.getInt("id"),
+                  resultSet.getString("first_name"),
+                  resultSet.getString("last_name"),
+                  resultSet.getString("password"),
+                  resultSet.getString("email"));
+
+          if (user != null) {
+
+            //opretter token til User
+              Algorithm algorithm = Algorithm.HMAC256("secret");
+              String token = JWT.create()
+                      .withClaim("userid", user.getId())
+                      .sign(algorithm);
+                      user.setToken(token);
+
+              return user;
+
+          }
+
+        } else {
+          System.out.println("Bruger ikke fundet");
+        }
+
+        //SQL exception
+      } catch (SQLException eSQL) {
+        System.out.println(eSQL.getMessage());
+      }
+      return user;
+
+    }
+
+
+  }
+
+
+
+
+
+
+
+
 

@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.User;
 import utils.Encryption;
+import utils.Hashing;
 import utils.Log;
 
 @Path("user")
@@ -86,15 +87,32 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make the system able to login users and assign them a token to use throughout the system.
+
+
+  // TODO: Make the system able to login users and assign them a token to use throughout the system. (FIX)
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(String body) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    User authUser = new Gson().fromJson(body, User.class);
+
+    //Instantierer hashing
+    Hashing hashing = new Hashing();
+
+    User currentUser = UserController.authorizeUser(authUser.getEmail());
+    String json = new Gson().toJson(currentUser);
+
+    //Tjekker om indtastede email og password stemmer overens med databasen
+    if (currentUser != null && authUser.getEmail().equals(currentUser.getEmail()) && hashing.saltingSha(authUser.getPassword()).equals(currentUser.getPassword())) {
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("You are now logged in!" + json).build();
+    } else {
+
+      // Return a response with status 200 and JSON as type
+      return Response.status(400).entity("Endpoint not implemented yet").build();
+    }
   }
+
 
   // TODO: Make the system able to delete users (FIX)
   @POST

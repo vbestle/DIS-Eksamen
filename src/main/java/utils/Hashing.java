@@ -45,7 +45,7 @@ public final class Hashing {
 
     String salted = str + this.salt;
 
-    return sha(salted);
+    return md5(salted);
   }
 
 
