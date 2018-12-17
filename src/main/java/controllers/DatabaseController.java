@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import model.User;
 import utils.Config;
 
 public class DatabaseController {
@@ -112,7 +114,7 @@ public class DatabaseController {
   }
 
 
-  public boolean deleteUser(String sql) {
+  public boolean updateOrDeleteUser(String sql) {
 
     // Check that we have connection
     if (connection == null)
@@ -120,15 +122,11 @@ public class DatabaseController {
 
     try {
       // Build the statement up in a safe way
-      PreparedStatement statement =
-              connection.prepareStatement(sql);
+      PreparedStatement statement = connection.prepareStatement(sql);
+      statement.executeUpdate();
+      return true;
 
-      // Execute query
-      int rowsAffected = statement.executeUpdate();
 
-      if (rowsAffected == 1) {
-        return true;
-      }
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }

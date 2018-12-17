@@ -109,7 +109,7 @@ public class UserEndpoints {
     } else {
 
       // Return a response with status 200 and JSON as type
-      return Response.status(400).entity("Endpoint not implemented yet").build();
+      return Response.status(400).entity("Something went wrong").build();
     }
   }
 
@@ -117,15 +117,14 @@ public class UserEndpoints {
   // TODO: Make the system able to delete users (FIX)
   @POST
   @Path("delete/{delete}")
-  public Response deleteUser(@PathParam("delete") int userToDeleteId) {
+  public Response deleteUser(@PathParam("delete") String token) {
 
 
-    boolean deleted = UserController.deleteUser(userToDeleteId);
-    userCache.getUsers(true);
+    boolean deleted = UserController.deleteUser(token);
 
     if(deleted){
 
-      return Response.status(200).entity("User " + userToDeleteId + " has been deleted").build();
+      return Response.status(200).entity("User has been deleted").build();
     } else {
       return Response.status(400).entity("Colud not delete user. Check if user exist").build();
     }
@@ -133,9 +132,23 @@ public class UserEndpoints {
   }
 
   // TODO: Make the system able to update users
-  public Response updateUser(String x) {
+  @POST
+  @Path("/update")
+  public Response updateUser(String body) {
 
+    // Read the json from body and transfer it to a user class
+    User newUser = new Gson().fromJson(body, User.class);
+
+    User updatedUser = UserController.updateUser(newUser);
+    String json = new Gson().toJson(updatedUser);
+
+    if (updatedUser != null) {
+      return Response.status(200).entity(json).build();
+    } else
+    {
+      return Response.status(400).entity("Something went wrong").build();
+    }
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+
   }
 }

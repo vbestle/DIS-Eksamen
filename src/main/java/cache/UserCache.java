@@ -30,7 +30,7 @@ public class UserCache {
                 || ((this.created + this.ttl) <= (System.currentTimeMillis() / 1000L))
                 || this.users.isEmpty()) {
 
-            // Get products from controller, since we wish to update.
+            // Get users from controller, since we wish to update.
             ArrayList<User> users = UserController.getUsers();
 
             // Set products for the instance and set created timestamp

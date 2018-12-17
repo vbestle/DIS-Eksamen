@@ -5,8 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import model.User;
 import utils.Hashing;
@@ -21,6 +24,9 @@ public class UserController {
   public UserController() {
     dbCon = new DatabaseController();
   }
+
+  //hashing initialiseres
+  public static Hashing hashing = new Hashing();
 
   public static User getUser(int id) {
 
@@ -101,8 +107,7 @@ public class UserController {
     return users;
   }
 
-  //hashing initialiseres
-  public static Hashing hashing = new Hashing();
+
 
   public static User createUser(User user) {
 
@@ -146,7 +151,7 @@ public class UserController {
 
 
   // Delete User metode
-  public static boolean deleteUser(int id) {
+  public static boolean deleteUser(String token) {
 
 
     // Check for DB Connection
@@ -154,31 +159,71 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
+    DecodedJWT jwt = null;
+      Algorithm algorithm = Algorithm.HMAC256("secret");
+      JWTVerifier verifier = JWT.require(algorithm)
+              .build();
+      jwt = verifier.verify(token);
+
+
     // Delete the user from the DB
-    User userToDelete = UserController.getUser(id);
-    String sql = "DELETE FROM user WHERE id=" + id;
+    String sql = "DELETE FROM user WHERE id=" + jwt.getClaim("userid").asInt();
 
-    return userToDelete != null && dbCon.deleteUser(sql);
-
+    return dbCon.updateOrDeleteUser(sql);
 
   }
 
 
 //Update User metode
-/*
-  public static User updateUser(User id) {
+
+  public static User updateUser(User updatedUser) {
 
     // Check for DB Connection
     if (dbCon == null) {
       dbCon = new DatabaseController();
     }
 
+    DecodedJWT jwt = null;
+    try{
+      jwt = JWT.decode(updatedUser.getToken());
+    } catch (JWTDecodeException eJWT) {
+
+    }
+    int id = jwt.getClaim("userid").asInt();
+
     User userToUpdate = UserController.getUser(id);
-    String sql = "UPDATE user SET(first_name, last_name, password, email) WHERE id=" + id;
+
+    if (updatedUser.getFirstname() == null) {
+      updatedUser.setFirstname(userToUpdate.getFirstname());
+    }
+    if (updatedUser.getLastname() == null) {
+      updatedUser.setLastname(userToUpdate.getLastname());
+    }
+    if (updatedUser.getEmail() == null) {
+      updatedUser.setEmail(userToUpdate.getEmail());
+    }
+    if (updatedUser.getPassword() == null) {
+      updatedUser.setPassword(userToUpdate.getPassword());
+    }
 
 
-  }
-*/
+    String sql =
+            "UPDATE user SET first_name = ,'" + updatedUser.getFirstname() +
+            "'last_name = ,'" + updatedUser.getLastname() +
+            "'password = ,'" + hashing.saltingSha(updatedUser.getPassword()) +
+            "'email = ,'" + updatedUser.getEmail() +
+            "'WHERE id='" + jwt.getClaim("userid").asInt();
+
+
+     if(dbCon.updateOrDeleteUser((sql))){
+       return updatedUser;
+    }
+
+    return null;
+
+
+    }
+
 
   //Authorize User metode til login
 
