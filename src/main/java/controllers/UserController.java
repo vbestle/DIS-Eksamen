@@ -9,6 +9,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import model.User;
@@ -160,10 +161,13 @@ public class UserController {
     }
 
     DecodedJWT jwt = null;
+    try {
       Algorithm algorithm = Algorithm.HMAC256("secret");
       JWTVerifier verifier = JWT.require(algorithm)
               .build();
       jwt = verifier.verify(token);
+    }catch (JWTVerificationException e) {
+    }
 
 
     // Delete the user from the DB
@@ -215,7 +219,7 @@ public class UserController {
             "'WHERE id='" + jwt.getClaim("userid").asInt();
 
 
-     if(dbCon.updateOrDeleteUser((sql))){
+     if(dbCon.updateOrDeleteUser(sql)){
        return updatedUser;
     }
 
@@ -273,7 +277,6 @@ public class UserController {
       return user;
 
     }
-
 
   }
 

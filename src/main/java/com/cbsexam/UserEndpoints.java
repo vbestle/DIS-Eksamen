@@ -1,6 +1,8 @@
 package com.cbsexam;
 
 import cache.UserCache;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
@@ -77,6 +79,7 @@ public class UserEndpoints {
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createUser);
 
+    userCache.getUsers(true);
 
     // Return the data to the user
     if (createUser != null) {
@@ -114,16 +117,14 @@ public class UserEndpoints {
   }
 
 
-  // TODO: Make the system able to delete users (FIX)
+  // TODO: Make the system able to delete users
   @POST
   @Path("delete/{delete}")
   public Response deleteUser(@PathParam("delete") String token) {
 
-
     boolean deleted = UserController.deleteUser(token);
 
     if(deleted){
-
       return Response.status(200).entity("User has been deleted").build();
     } else {
       return Response.status(400).entity("Colud not delete user. Check if user exist").build();
@@ -134,21 +135,23 @@ public class UserEndpoints {
   // TODO: Make the system able to update users
   @POST
   @Path("/update")
+  @Consumes(MediaType.APPLICATION_JSON)
   public Response updateUser(String body) {
 
     // Read the json from body and transfer it to a user class
     User newUser = new Gson().fromJson(body, User.class);
 
     User updatedUser = UserController.updateUser(newUser);
+
     String json = new Gson().toJson(updatedUser);
 
     if (updatedUser != null) {
-      return Response.status(200).entity(json).build();
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     } else
     {
       return Response.status(400).entity("Something went wrong").build();
     }
-    // Return a response with status 200 and JSON as type
 
   }
 }
